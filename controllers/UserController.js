@@ -51,6 +51,13 @@ var getUserByEmailAddressOrId = function(req, res){
 	});
 };
 
+var getUserByAccessToken = function(req, res){
+	var token = req.params.accessToken;
+	getUserByAccessTokenInternal(token).then(function(user){
+		res.send(user);
+	});
+};
+
 /* Private Methods */
 
 var getUserByIdOrEmailInternal = function(toFind){
@@ -76,6 +83,14 @@ var getUserByEmailAddressInternal = function(emailAddress){
 	return deferred.promise;
 };
 
+var getUserByAccessTokenInternal = function(token){
+	var deferred = Q.defer();
+	User.findOne({accessToken:token}, function(err, user){
+		deferred.resolve(user);
+	});
+	return deferred.promise;
+};
+
 var getUserByIdInternal = function(id){
 	var deferred = Q.defer();
 	User.findOne({_id:id}, function(err, user){
@@ -93,11 +108,15 @@ var createUserInternal = function(emailAddress, password){
     user.salt = uuid.v4();
     user.password = utils.hashPassword(password, user.salt);
 
+    var token = uuid.v4();
+
+    //var encryptedToken = utils.encryptString(token);
+
+    user.accessToken = token;
+
     user.save(function(err, userEntity){
     	deferred.resolve(userEntity);
     });
-
-
 
     return deferred.promise;
 };
@@ -120,5 +139,6 @@ var getAllUsersInternal = function(){
 module.exports = {
 	createUser: createUser,
 	getUsers: getUsers,
-	getUserByEmailAddressOrId: getUserByEmailAddressOrId
+	getUserByEmailAddressOrId: getUserByEmailAddressOrId,
+	getUserByAccessToken: getUserByAccessToken
 };

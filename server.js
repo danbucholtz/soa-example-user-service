@@ -4,10 +4,11 @@ var config = require("soa-example-service-config").config();
 
 var userController = require('./controllers/UserController');
 
-mongoose.connect(servicesConfig.mongoUri);
+mongoose.connect(config.mongoUri);
 
-var app = service.createServer(config.authenticationServicePort);
+var app = service.createApiServer(config.userServicePort);
 
 app.post('/register', userController.createUser);
-app.get('/users', userController.getUsers);
+app.get('/users', service.ensureAuthenticated, userController.getUsers);
 app.get('/users/:id', userController.getUserByEmailAddressOrId);
+app.get("/users/accessToken/:id", userController.getUserByAccessToken);
