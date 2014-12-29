@@ -33,6 +33,30 @@ var createUser = function(req, res){
 	});
 };
 
+var getSystemUser = function(req, res){
+	getSystemUserInternal().then(function(user){
+		res.send(user);
+	});
+};
+
+var getSystemUserInternal = function(){
+	var deferred = Q.defer();
+	
+	getUserByEmailAddressInternal("system@system.com").then(function(user){
+		if ( user ){
+			deferred.resolve(user);
+		}
+		else{
+			// create the user
+			createUserInternal("system@system.com", uuid.v4()).then(function(newUser){
+				deferred.resolve(user);
+			});
+		}
+	});
+
+	return deferred.promise;
+};
+
 var getUsers = function(req, res){
 	getAllUsersInternal().then(function(users){
 		res.send(users);
@@ -138,6 +162,7 @@ var getAllUsersInternal = function(){
 
 module.exports = {
 	createUser: createUser,
+	getSystemUser: getSystemUser,
 	getUsers: getUsers,
 	getUserByEmailAddressOrId: getUserByEmailAddressOrId,
 	getUserByAccessToken: getUserByAccessToken
