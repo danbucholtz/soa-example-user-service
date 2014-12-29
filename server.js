@@ -11,4 +11,4 @@ var app = service.createApiServer(config.userServicePort);
 app.post('/register', userController.createUser);
 app.get('/users', service.ensureAuthenticated, userController.getUsers);
 app.get('/users/:id', userController.getUserByEmailAddressOrId);
-app.get("/users/accessToken/:id", userController.getUserByAccessToken);
+app.get("/users/accessToken/:accessToken", userController.getUserByAccessToken);
