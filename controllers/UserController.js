@@ -5,6 +5,7 @@ var User = require("../models/User");
 var utils = require("soa-example-core-utils");
 
 var config = require("soa-example-service-config").config();
+var log = require('soa-example-logging-service-api');
 
 var createUser = function(req, res){
 	var emailAddress = req.body.emailAddress;
@@ -36,7 +37,9 @@ var createUser = function(req, res){
 };
 
 var getUsers = function(req, res){
+	log.debug(req.user.accessToken, "getUsers: User [" + req.user.emailAddress + "] is requesting all Users ...");
 	getAllUsersInternal().then(function(users){
+		log.debug(req.user.accessToken, "getUsers: User [" + req.user.emailAddress + "] is requesting all Users ... DONE");
 		res.send(users);
 	});
 }
@@ -79,7 +82,9 @@ var getUserByIdOrEmailInternal = function(toFind){
 
 var getUserByEmailAddressInternal = function(emailAddress){
 	var deferred = Q.defer();
+	log.debug(config.systemAccessToken, "getUserByEmailAddressInternal: Getting User By Email Address [" + emailAddress + "] ...");
 	User.findOne({emailAddress:emailAddress}, function(err, user){
+		log.debug(config.systemAccessToken, "getUserByEmailAddressInternal: Getting User By Email Address [" + emailAddress + "] ... DONE");
 		deferred.resolve(user);
 	});
 	return deferred.promise;
@@ -87,7 +92,9 @@ var getUserByEmailAddressInternal = function(emailAddress){
 
 var getUserByAccessTokenInternal = function(token){
 	var deferred = Q.defer();
+	log.debug(config.systemAccessToken, "getUserByAccessTokenInternal: Getting User By Token [" + token + "] ...");
 	User.findOne({accessToken:token}, function(err, user){
+		log.debug(config.systemAccessToken, "getUserByAccessTokenInternal: Getting User By Token [" + token + "] ... DONE");
 		deferred.resolve(user);
 	});
 	return deferred.promise;
@@ -95,7 +102,9 @@ var getUserByAccessTokenInternal = function(token){
 
 var getUserByIdInternal = function(id){
 	var deferred = Q.defer();
+	log.debug(config.systemAccessToken, "getUserByIdInternal: Getting User By ID [" + id + "] ...");
 	User.findOne({_id:id}, function(err, user){
+		log.debug(config.systemAccessToken, "getUserByIdInternal: Getting User By ID [" + id + "] ... DONE");
 		deferred.resolve(user);
 	});
 	return deferred.promise;
@@ -103,6 +112,8 @@ var getUserByIdInternal = function(id){
 
 var createUserInternal = function(emailAddress, password){
 	var deferred = Q.defer();
+
+	log.debug(config.systemAccessToken, "createUserInternal: Creating User [" + emailAddress + "] ...");
 	
 	var user = new User();
     user.created = new Date();
@@ -112,11 +123,10 @@ var createUserInternal = function(emailAddress, password){
 
     var token = uuid.v4();
 
-    //var encryptedToken = utils.encryptString(token);
-
     user.accessToken = token;
 
     user.save(function(err, userEntity){
+    	log.debug(config.systemAccessToken, "createUserInternal: Creating User [" + emailAddress + "] ... DONE");
     	deferred.resolve(userEntity);
     });
 
