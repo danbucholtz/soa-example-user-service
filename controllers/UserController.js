@@ -4,6 +4,8 @@ var User = require("../models/User");
 
 var utils = require("soa-example-core-utils");
 
+var config = require("soa-example-service-config").config();
+
 var createUser = function(req, res){
 	var emailAddress = req.body.emailAddress;
 	var password = req.body.password;
@@ -31,30 +33,6 @@ var createUser = function(req, res){
 			});
 		}
 	});
-};
-
-var getSystemUser = function(req, res){
-	getSystemUserInternal().then(function(user){
-		res.send(user);
-	});
-};
-
-var getSystemUserInternal = function(){
-	var deferred = Q.defer();
-	
-	getUserByEmailAddressInternal("system@system.com").then(function(user){
-		if ( user ){
-			deferred.resolve(user);
-		}
-		else{
-			// create the user
-			createUserInternal("system@system.com", uuid.v4()).then(function(newUser){
-				deferred.resolve(user);
-			});
-		}
-	});
-
-	return deferred.promise;
 };
 
 var getUsers = function(req, res){
@@ -148,7 +126,7 @@ var createUserInternal = function(emailAddress, password){
 var getAllUsersInternal = function(){
 	var deferred = Q.defer();
 
-	User.find(function(err, entities){
+	User.find({emailAddresss: { $ne : config.systemAdminUsername} }, function(err, entities){
 		if ( err ){
 			deferred.reject(err);
 		}
@@ -162,7 +140,6 @@ var getAllUsersInternal = function(){
 
 module.exports = {
 	createUser: createUser,
-	getSystemUser: getSystemUser,
 	getUsers: getUsers,
 	getUserByEmailAddressOrId: getUserByEmailAddressOrId,
 	getUserByAccessToken: getUserByAccessToken
