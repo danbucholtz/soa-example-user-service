@@ -126,7 +126,7 @@ var createUserInternal = function(emailAddress, password){
 var getAllUsersInternal = function(){
 	var deferred = Q.defer();
 
-	User.find({emailAddresss: { $ne : config.systemAdminUsername} }, function(err, entities){
+	User.find({emailAddress: { $ne : config.systemAdminUsername} }, function(err, entities){
 		if ( err ){
 			deferred.reject(err);
 		}
