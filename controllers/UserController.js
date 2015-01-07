@@ -121,7 +121,7 @@ var createUserInternal = function(emailAddress, password){
     user.salt = uuid.v4();
     user.password = utils.hashPassword(password, user.salt);
 
-    var token = uuid.v4();
+    var token = uuid.v4() + "-" + uuid.v4() + "-" + uuid.v4() + "-" + uuid.v4() + "-" + uuid.v4();
 
     user.accessToken = token;
 
